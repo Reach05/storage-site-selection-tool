@@ -1,0 +1,1 @@
+// Google Places API competitor logic
