@@ -1,0 +1,4 @@
+node_modules/
+.next/
+.env.local
+site-selection-screenshots-storage.zip

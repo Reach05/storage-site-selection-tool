@@ -1,2 +1,5 @@
 site-selection-screenshots.zip
 site-selection-screenshots-storage.zip
+screenshots/
+site-selection-screenshots-storage.zip
+*.code-workspace
