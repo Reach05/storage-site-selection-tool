@@ -7,21 +7,15 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-
-    # Explicitly set permissions for the job
     permissions:
-      contents: write  # Ensures the token has write permissions to create releases
+      contents: write
 
     steps:
-      # Checkout the repository
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Create a ZIP archive of the repository
       - name: Create ZIP archive
         run: zip -r site-selection-tool.zip ./*
 
-      # Create a new GitHub release
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -31,7 +25,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Upload the ZIP archive to the release
       - name: Upload ZIP to Release
         uses: softprops/action-gh-release@v1
         with:
