@@ -14,7 +14,7 @@ export default function FemaDemo() {
   }, []);
 
   if (error) return <pre>Error: {error}</pre>;
-  if (!data) return <p>Loading…</p>;
+  if (!data)  return <p>Loading…</p>;
 
   return (
     <div>

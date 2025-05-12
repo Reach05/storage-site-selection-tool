@@ -3,3 +3,26 @@ site-selection-screenshots-storage.zip
 screenshots/
 site-selection-screenshots-storage.zip
 *.code-workspace
+# Next.js build output
+.next/
+out/
+
+# Node dependencies
+node_modules/
+
+# Local env files
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Vercel / Cloud Run artifacts
+site-selection-tool.zip
+screenshots/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

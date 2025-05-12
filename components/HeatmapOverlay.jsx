@@ -1,1 +1,0 @@
-// Heatmaps for income/pop density
