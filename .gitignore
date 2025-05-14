@@ -1,28 +1,29 @@
+# ── Archives & Zips ──
 site-selection-screenshots.zip
 site-selection-screenshots-storage.zip
-screenshots/
-site-selection-screenshots-storage.zip
-*.code-workspace
-# Next.js build output
+
+# ── Next.js build output ──
 .next/
 out/
 
-# Node dependencies
+# ── Node dependencies ──
 node_modules/
 
-# Local env files
+# ── Local env files ──
+.env
 .env.local
-.env.development.local
-.env.production.local
-.env.test.local
+.env.*.local
 
-# Vercel / Cloud Run artifacts
+# ── Vercel / Cloud Run artifacts ──
 site-selection-tool.zip
+
+# ── Screenshots & IDE workspaces ──
 screenshots/
 *.code-workspace
 
-# OS files
+# ── OS / Editor files ──
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
+
