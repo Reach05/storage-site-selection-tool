@@ -1,24 +1,37 @@
-import { useEffect, useRef } from "react";
-import { loadModules } from "esri-loader";
+// components/MapView.jsx
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { loadModules } from 'esri-loader';
 
-export default function MapView() {
-  const mapRef = useRef();
+const MapView = forwardRef(function MapView(_, ref) {
+  const containerRef = useRef();
+  const viewRef = useRef();
+
+  useImperativeHandle(ref, () => viewRef.current, []);
 
   useEffect(() => {
+    let view;
     (async () => {
       const [Map, MapView] = await loadModules([
-        "esri/Map",
-        "esri/views/MapView"
+        'esri/Map',
+        'esri/views/MapView'
       ]);
-      const map = new Map({ basemap: "streets" });
-      const view = new MapView({
-        container: mapRef.current,
-        map,
-        center: [-98.57, 39.83],
-        zoom: 5
+      view = new MapView({
+        container: containerRef.current,
+        map: new Map({ basemap: 'streets-vector' }),
+        center: [-118.805, 34.027],
+        zoom: 13
       });
+      viewRef.current = view;
     })();
+
+    return () => {
+      if (view) {
+        view.destroy();
+      }
+    };
   }, []);
 
-  return <div ref={mapRef} style={{ width: "100%", height: "100vh" }} />;
-}
+  return <div style={{ width: '100%', height: '100vh' }} ref={containerRef} />;
+});
+
+export default MapView;

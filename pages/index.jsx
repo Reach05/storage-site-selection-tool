@@ -1,29 +1,31 @@
-import Link from "next/link";
+import React, { useState } from 'react';
+import MapView from '../components/MapView';
+import DriveTimePolygons from '../components/DriveTimePolygons';
+import HeatMapOverlay from '../components/HeatMapOverlay';
+import FloodZoneOverlay from '../components/FloodZoneOverlay';
 
 export default function Home() {
+  // assume MapView provides `view` via context or render‐prop
+  const [view, setView] = useState(null);
+
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Storage Site Selection Tool</h1>
-      <ul>
-        <li>
-          <Link href="/fema-demo">FEMA Flood Zones Demo</Link>
-        </li>
-        <li>
-          <Link href="/competitor-search">Competitor Search</Link>
-        </li>
-        <li>
-          <Link href="/drive-time">Drive-Time Polygons</Link>
-        </li>
-        <li>
-          <Link href="/heatmap">Heatmap Overlays</Link>
-        </li>
-        <li>
-          <Link href="/map-view">Full Map View</Link>
-        </li>
-        <li>
-          <Link href="/site-scoring">Site Scoring Chart</Link>
-        </li>
-      </ul>
-    </div>
+    <MapView onViewCreated={setView}>
+      {view && (
+        <>
+          <DriveTimePolygons
+            view={view}
+            serviceUrl="https://your-org.maps.arcgis.com/arcgis/rest/services/DriveTime/FeatureServer/0"
+          />
+          <HeatMapOverlay
+            view={view}
+            serviceUrl="https://your-org.maps.arcgis.com/arcgis/rest/services/Points/FeatureServer/0"
+          />
+          <FloodZoneOverlay
+            view={view}
+            serviceUrl="https://landscape11.arcgis.com/arcgis/rest/services/USA_Flood_Hazard_Areas/ImageServer"
+          />
+        </>
+      )}
+    </MapView>
   );
 }

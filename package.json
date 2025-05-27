@@ -1,25 +1,21 @@
 {
   "name": "storage-site-selection-tool",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.cjs",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "echo \"No tests\" && exit 0"
+    "start": "node server.cjs"
   },
   "dependencies": {
-    "cross-fetch": "^3.2.0",
-    "dotenv": "^16.0.3",
+    "@esri/arcgis-rest-feature-service": "^4.1.0",
+    "@esri/arcgis-rest-request": "^4.5.0",
+    "@vercel/speed-insights": "^1.2.0",
+    "cross-fetch": "^3.1.5",
     "esri-loader": "^3.7.0",
     "next": "15.3.2",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "recharts": "^2.15.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Reach05/storage-site-selection-tool.git"
   }
 }

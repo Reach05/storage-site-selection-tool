@@ -1,18 +1,33 @@
-import { useEffect, useRef } from "react";
-import { loadModules } from "esri-loader";
+import { useEffect } from 'react';
+import { loadModules } from 'esri-loader';
 
-export default function DriveTimePolygons({ serviceUrl }) {
-  const viewRef = useRef();
-
+/**
+ * Renders drive-time polygons from an ArcGIS Feature Service.
+ *
+ * Props:
+ *   - view: the MapView instance
+ *   - serviceUrl: URL to a FeatureServer layer (e.g. ".../FeatureServer/0")
+ */
+export default function DriveTimePolygons({ view, serviceUrl }) {
   useEffect(() => {
-    (async () => {
-      const [FeatureLayer] = await loadModules(["esri/layers/FeatureLayer"]);
-      const fl = new FeatureLayer({ url: serviceUrl });
-      fl.load().then(() => {
-        viewRef.current.map.add(fl);
-      });
-    })();
-  }, [serviceUrl]);
+    let layer;
+    loadModules(['esri/layers/FeatureLayer'])
+      .then(([FeatureLayer]) => {
+        layer = new FeatureLayer({
+          url: serviceUrl,
+          // you can customize renderer, opacity, etc, here
+          opacity: 0.5
+        });
+        view.map.add(layer);
+      })
+      .catch(console.error);
 
-  return <div ref={viewRef} style={{ width: "100%", height: "100%" }} />;
+    return () => {
+      if (layer) {
+        view.map.remove(layer);
+      }
+    };
+  }, [view, serviceUrl]);
+
+  return null;
 }

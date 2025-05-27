@@ -1,17 +1,47 @@
-import { useEffect, useRef } from "react";
-import { loadModules } from "esri-loader";
+import { useEffect } from 'react';
+import { loadModules } from 'esri-loader';
 
-export default function HeatMapOverlay({ populationUrl, incomeUrl }) {
-  const viewRef = useRef();
-
+/**
+ * Renders a client‐side heatmap from a Feature Service.
+ *
+ * Props:
+ *   - view: the MapView instance
+ *   - serviceUrl: URL to a FeatureServer layer (e.g. ".../FeatureServer/0")
+ */
+export default function HeatMapOverlay({ view, serviceUrl }) {
   useEffect(() => {
-    (async () => {
-      const [FeatureLayer] = await loadModules(["esri/layers/FeatureLayer"]);
-      const popLayer = new FeatureLayer({ url: populationUrl });
-      const incLayer = new FeatureLayer({ url: incomeUrl });
-      viewRef.current.map.addMany([popLayer, incLayer]);
-    })();
-  }, [populationUrl, incomeUrl]);
+    let layer;
+    loadModules([
+      'esri/layers/FeatureLayer',
+      'esri/renderers/HeatmapRenderer'
+    ])
+      .then(([FeatureLayer, HeatmapRenderer]) => {
+        layer = new FeatureLayer({
+          url: serviceUrl,
+          renderer: new HeatmapRenderer({
+            colorStops: [
+              { ratio: 0, color: 'rgba(63, 40, 102, 0)' },
+              { ratio: 0.2, color: 'purple' },
+              { ratio: 0.4, color: 'blue' },
+              { ratio: 0.6, color: 'cyan' },
+              { ratio: 0.8, color: 'lime' },
+              { ratio: 1, color: 'yellow' }
+            ],
+            maxPixelIntensity: 100,
+            minPixelIntensity: 0
+          }),
+          opacity: 0.7
+        });
+        view.map.add(layer);
+      })
+      .catch(console.error);
 
-  return <div ref={viewRef} style={{ width: "100%", height: "100%" }} />;
+    return () => {
+      if (layer) {
+        view.map.remove(layer);
+      }
+    };
+  }, [view, serviceUrl]);
+
+  return null;
 }
