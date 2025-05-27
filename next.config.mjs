@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  // (no experimental.allowedDevOrigins or swcMinify here)
+  // any other flags you need… e.g. experimental.esmExternals
 };
 
 export default nextConfig;

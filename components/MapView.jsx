@@ -1,37 +1,25 @@
 // components/MapView.jsx
-import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import { loadModules } from 'esri-loader';
+import { useEffect, useRef } from "react";
+import Map from "@arcgis/core/Map";
+import MapView from "@arcgis/core/views/MapView";
 
-const MapView = forwardRef(function MapView(_, ref) {
-  const containerRef = useRef();
-  const viewRef = useRef();
-
-  useImperativeHandle(ref, () => viewRef.current, []);
+export default function MapViewComponent() {
+  const container = useRef(null);
 
   useEffect(() => {
-    let view;
-    (async () => {
-      const [Map, MapView] = await loadModules([
-        'esri/Map',
-        'esri/views/MapView'
-      ]);
-      view = new MapView({
-        container: containerRef.current,
-        map: new Map({ basemap: 'streets-vector' }),
-        center: [-118.805, 34.027],
-        zoom: 13
-      });
-      viewRef.current = view;
-    })();
+    const map = new Map({ basemap: "streets-vector" });
+
+    const view = new MapView({
+      container: container.current,
+      map,
+      zoom: 5,
+      center: [-118.2437, 34.0522], // Los Angeles
+    });
 
     return () => {
-      if (view) {
-        view.destroy();
-      }
+      view.destroy();
     };
   }, []);
 
-  return <div style={{ width: '100%', height: '100vh' }} ref={containerRef} />;
-});
-
-export default MapView;
+  return <div ref={container} style={{ width: "100%", height: "100%" }} />;
+}

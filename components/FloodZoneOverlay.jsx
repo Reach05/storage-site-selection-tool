@@ -1,46 +1,48 @@
-import { useEffect } from 'react';
-import { loadModules } from 'esri-loader';
+// components/FloodZoneOverlay.jsx
+import { useEffect, useRef } from "react";
+import Map from "@arcgis/core/Map";
+import MapView from "@arcgis/core/views/MapView";
+import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
 
-/**
- * Renders the Living Atlas Flood Hazard as a GeoJSONLayer.
- *
- * Props:
- *   - view: the MapView instance
- *   - serviceUrl: URL to the ImageServer (e.g.
- *       "https://landscape11.arcgis.com/arcgis/rest/services/USA_Flood_Hazard_Areas/ImageServer")
- */
-export default function FloodZoneOverlay({ view, serviceUrl }) {
+export default function FloodZoneOverlay({
+  serviceUrl,                  // REST endpoint of your flood-zone Map Service
+  basemap = "topo-vector",
+  center = [-118.2437, 34.0522],
+  zoom = 10
+}) {
+  const containerRef = useRef(null);
+
   useEffect(() => {
-    let geojsonLayer;
+    if (!containerRef.current) return;
 
-    loadModules(['esri/layers/GeoJSONLayer'])
-      .then(([GeoJSONLayer]) => {
-        // construct a REST query URL that returns GeoJSON
-        const queryUrl = `${serviceUrl}/query?f=geojson&where=1=1&outFields=*`;
+    // 1. Create map & view
+    const map = new Map({ basemap });
+    const view = new MapView({
+      container: containerRef.current,
+      map,
+      center,
+      zoom,
+    });
 
-        geojsonLayer = new GeoJSONLayer({
-          url: queryUrl,
-          opacity: 0.5,
-          renderer: {
-            type: 'simple', // autocasts to SimpleRenderer
-            symbol: {
-              type: 'simple-fill', // autocasts to SimpleFillSymbol
-              color: 'rgba(0,0,255,0.3)',
-              outline: { width: 1, color: '#0000FF' }
-            }
-          }
-        });
+    // 2. Add flood-zone layer
+    const floodLayer = new MapImageLayer({
+      url: serviceUrl,
+      // you can further configure sublayers, opacity, etc.
+      opacity: 0.6
+    });
 
-        view.map.add(geojsonLayer);
-      })
-      .catch(console.error);
+    map.add(floodLayer);
 
+    // 3. Cleanup
     return () => {
-      if (geojsonLayer) {
-        view.map.remove(geojsonLayer);
-      }
+      view.destroy();
     };
-  }, [view, serviceUrl]);
+  }, [serviceUrl, basemap, center, zoom]);
 
-  return null;
+  return (
+    <div
+      ref={containerRef}
+      style={{ width: "100%", height: "100%", position: "relative" }}
+    />
+  );
 }
