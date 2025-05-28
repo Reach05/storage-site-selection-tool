@@ -1,5 +1,3 @@
-# Use Docker to build your multi-stage image in Cloud Build
-
 steps:
   - name: "gcr.io/cloud-builders/docker"
     args:
@@ -9,7 +7,5 @@ steps:
         "gcr.io/$PROJECT_ID/storage-site-selection-tool",
         "."
       ]
-
-# Publish the resulting image
 images:
   - "gcr.io/$PROJECT_ID/storage-site-selection-tool"
