@@ -1,12 +1,18 @@
-/** @type {import('next').NextConfig} */
-module.exports = {
+import withTM from 'next-transpile-modules'
+
+// force Next.js to transpile these ESM packages
+const nextConfig = withTM([
+  '@arcgis/core',
+  'esri-loader'
+])({
+  reactStrictMode: true,
   webpack(config) {
-    // ignore the "start value has mixed support" warning from @arcgis core CSS
     config.ignoreWarnings = [
       (warning) =>
-        warning.module &&
         warning.message?.includes('start value has mixed support'),
     ];
     return config;
   },
-};git
+});
+
+export default nextConfig;

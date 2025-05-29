@@ -1,46 +1,44 @@
 # ----------------------------------------
 # Stage 1: Build
 # ----------------------------------------
-FROM node:24-alpine3.21 AS builder
+FROM node:slim AS builder
 WORKDIR /app
 
-# Install dependencies
+# 1) Copy only package files and your copy‐assets script
 COPY package.json package-lock.json ./
+COPY scripts ./scripts
+
+# 2) Install dependencies (this runs postinstall, which now finds scripts/)
 RUN npm ci
 
-# Copy source, fetch ArcGIS assets, build & prune dev deps
+# 3) Copy the rest of your source
 COPY . .
-RUN npm run postinstall \
- && npm run build \
- && npm prune --production
+
+# 4) (Re-run postinstall to catch any assets added after full copy)
+RUN npm run postinstall
+
+# 5) Build the Next.js app
+RUN npm run build
+
 
 # ----------------------------------------
 # Stage 2: Production
 # ----------------------------------------
-FROM node:24-alpine3.21 AS runner
+FROM node:slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy only the production artifacts
-COPY --from=builder /app/package.json       ./package.json
-COPY --from=builder /app/next.config.mjs    ./next.config.mjs
-COPY --from=builder /app/.next              ./.next
-COPY --from=builder /app/public             ./public
-COPY --from=builder /app/node_modules       ./node_modules
+# 1) Copy runtime artifacts
+COPY --from=builder /app/package.json        ./package.json
+COPY --from=builder /app/next.config.mjs      ./next.config.mjs
+COPY --from=builder /app/.next                ./.next
+COPY --from=builder /app/node_modules         ./node_modules
+COPY --from=builder /app/public               ./public
 
-# Copy custom HTTPS server and certificates (if applicable)
-COPY --from=builder /app/server.cjs          ./server.cjs
-COPY --from=builder /app/certs               ./certs
+# 2) Copy your custom server and certs (if used in production)
+COPY --from=builder /app/server.cjs           ./server.cjs
+COPY --from=builder /app/certs                ./certs
 
-# Drop to a non-root user for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
+# 3) Expose & start
 EXPOSE 3000
-
-# Optional healthcheck (adjust protocol/URL if using HTTPS)
-HEALTHCHECK --interval=30s --timeout=5s \
-  CMD wget --quiet --tries=1 --spider http://localhost:3000/ || exit 1
-
-# Start the custom HTTPS server
-CMD ["node", "server.cjs"]
+CMD ["npm", "start"]
