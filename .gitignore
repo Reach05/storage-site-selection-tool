@@ -27,7 +27,8 @@ Thumbs.db
 .idea/
 .vscode/
 
-
 .vercel
-
 .fake
+
+# allow our well-known stub
+!public/empty.json
