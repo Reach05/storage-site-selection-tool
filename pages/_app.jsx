@@ -1,17 +1,19 @@
 // pages/_app.jsx
 import "../styles/globals.css";
-
-// 1. ArcGIS theme CSS
 import "@arcgis/core/assets/esri/themes/light/main.css";
-
-// 2. Tell @arcgis/core where to find its assets at runtime
 import esriConfig from "@arcgis/core/config";
-esriConfig.assetsPath = "/arcgis/assets/";
-
-// 3. Vercel Speed Insights
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { useEffect } from "react";
 
-export default function App({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps }) {
+  // Move the assetPath assignment into a client‐only effect
+  useEffect(() => {
+    // only run in browser
+    if (typeof window !== "undefined") {
+      esriConfig.assetsPath = "/arcgis/assets/";
+    }
+  }, []);
+
   return (
     <>
       <Component {...pageProps} />

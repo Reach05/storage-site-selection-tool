@@ -1,19 +1,19 @@
-// scripts/copy-arcgis-assets.js
-import fs from "fs-extra";
-import path from "path";
+// filepath: scripts/copy-arcgis-assets.js
+import { emptyDir, copy } from 'fs-extra'
+import { fileURLToPath } from 'url'
+import path from 'path'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const src = path.resolve(__dirname, '../node_modules/@arcgis/core/assets')
+const dest = path.resolve(__dirname, '../public/arcgis/assets')
 
 async function main() {
-  const src = path.resolve("node_modules/@arcgis/core/assets");
-  const dest = path.resolve("public/arcgis/assets");
-
-  try {
-    // ensure dest dir exists, then recursively copy
-    await fs.copy(src, dest, { overwrite: true });
-    console.log("✅ ArcGIS assets copied to public/arcgis/assets");
-  } catch (err) {
-    console.error("❌ Failed to copy ArcGIS assets:", err);
-    process.exit(1);
-  }
+  await emptyDir(dest)
+  await copy(src, dest)
+  console.log('✅ ArcGIS assets copied to public/arcgis/assets')
 }
 
-main();
+main().catch((e) => {
+  console.error(e)
+  process.exit(1)
+})

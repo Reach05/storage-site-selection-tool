@@ -1,17 +1,13 @@
 // pages/index.jsx
-import Link from "next/link";
+export async function getServerSideProps() {
+  return {
+    redirect: {
+      destination: "/map-view",
+      permanent: false,   // use `true` if you want a 301
+    },
+  };
+}
 
-export default function Home() {
-  return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>🚀 Site Selection Tool</h1>
-      <p>Choose your view:</p>
-      <ul>
-        <li>
-          <Link href="/map-view">Interactive Map View</Link>
-        </li>
-        {/* add other entry points here as you build them */}
-      </ul>
-    </main>
-  );
+export default function Index() {
+  return null; // this never actually renders
 }
