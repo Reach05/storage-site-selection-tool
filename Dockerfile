@@ -1,44 +1,34 @@
 # ----------------------------------------
 # Stage 1: Build
 # ----------------------------------------
-FROM node:slim AS builder
+# • Use a patched Alpine image by pinning to its digest
+FROM node:18.16.1-alpine3.18@sha256:YOUR_UP_TO_DATE_DIGEST AS builder
 WORKDIR /app
 
-# 1) Copy only package files and your copy‐assets script
+# Install build deps & copy early for caching
 COPY package.json package-lock.json ./
 COPY scripts ./scripts
+RUN npm ci \
+ && npm run postinstall
 
-# 2) Install dependencies (this runs postinstall, which now finds scripts/)
-RUN npm ci
-
-# 3) Copy the rest of your source
+# Copy the rest & build
 COPY . .
-
-# 4) (Re-run postinstall to catch any assets added after full copy)
-RUN npm run postinstall
-
-# 5) Build the Next.js app
 RUN npm run build
-
 
 # ----------------------------------------
 # Stage 2: Production
 # ----------------------------------------
-FROM node:slim AS runner
+# • Same patched base, upgrade at container start just in case
+FROM node:18.16.1-alpine3.18@sha256:YOUR_UP_TO_DATE_DIGEST AS runner
 WORKDIR /app
-ENV NODE_ENV=production
 
-# 1) Copy runtime artifacts
-COPY --from=builder /app/package.json        ./package.json
-COPY --from=builder /app/next.config.mjs      ./next.config.mjs
-COPY --from=builder /app/.next                ./.next
-COPY --from=builder /app/node_modules         ./node_modules
-COPY --from=builder /app/public               ./public
+# Make sure Alpine pkgs are up-to-date
+RUN apk update && apk upgrade --no-cache \
+ && rm -rf /var/cache/apk/*
 
-# 2) Copy your custom server and certs (if used in production)
-COPY --from=builder /app/server.cjs           ./server.cjs
-COPY --from=builder /app/certs                ./certs
+# Pull in only the standalone build + public assets
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/public ./public
 
-# 3) Expose & start
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["node", "server.cjs"]
