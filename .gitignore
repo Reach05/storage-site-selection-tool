@@ -32,3 +32,8 @@ Thumbs.db
 
 # allow our well-known stub
 !public/empty.json
+!public/.well-known/appspecific/
+!public/.well-known/appspecific/com.chrome.devtools.json
+
+# ignore hint config
+.hintrc

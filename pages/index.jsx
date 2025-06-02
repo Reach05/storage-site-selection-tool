@@ -3,11 +3,11 @@ export async function getServerSideProps() {
   return {
     redirect: {
       destination: "/map-view",
-      permanent: false,   // use `true` if you want a 301
+      permanent: false, // 307 redirect
     },
   };
 }
 
 export default function Index() {
-  return null; // this never actually renders
+  return null; // this component never actually renders
 }

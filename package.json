@@ -18,13 +18,17 @@
   "overrides": {
     "glob": "^9.3.1",
     "inflight": "^1.0.7",
-    "node-domexception": "npm:domexception@^2.0.1"
+    "node-domexception": "npm:domexception@^2.0.1",
+    "braces": ">=3.0.3",
+    "micromatch": ">=4.0.4",
+    "postcss": ">=8.4.31"
   },
   "dependencies": {
     "@arcgis/core": "^4.32.10",
     "@esri/arcgis-rest-feature-service": "^4.1.0",
     "@esri/arcgis-rest-request": "^4.5.0",
     "@vercel/speed-insights": "^1.2.0",
+    "@zeit/next-css": "^1.0.1",
     "cross-fetch": "^3.1.5",
     "next": "15.3.2",
     "next-transpile-modules": "^10.0.1",
@@ -41,6 +45,7 @@
   },
   "browserslist": [
     "last 2 Chrome versions",
+    "last 2 Edge versions",
     "last 2 Firefox versions",
     "last 2 Safari versions",
     "not dead"

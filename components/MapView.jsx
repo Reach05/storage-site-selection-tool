@@ -1,48 +1,32 @@
-import React, { useEffect, useRef, useState } from 'react'
-import Map from '@arcgis/core/Map'
-import ArcGISMapView from '@arcgis/core/views/MapView'
+// components/MapView.jsx
+import { useEffect, useRef } from "react";
 
-export default function MapView({
-  initialCenter = [39.83, -98.58],
-  initialZoom = 12,
-  style = { width: '100%', height: '100%' },
-  children
-}) {
-  const containerRef = useRef(null)
-  const viewRef = useRef(null)
-  const [view, setView] = useState(null)
+export default function MapView({ initialCenter = [39.83, -98.5795], initialZoom = 10 }) {
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    if (viewRef.current) return  // hot-reload guard
+    let view;
+    let map;
+    // Only import @arcgis/core in the browser
+    (async () => {
+      const [Map, MapView] = await Promise.all([
+        import("@arcgis/core/Map").then((m) => m.default),
+        import("@arcgis/core/views/MapView").then((m) => m.default),
+      ]);
 
-    let mv
-    const init = async () => {
-      const map = new Map({ basemap: 'topo-vector' })
-      mv = new ArcGISMapView({
+      map = new Map({ basemap: "streets-vector" });
+      view = new MapView({
         container: containerRef.current,
         map,
         center: initialCenter,
         zoom: initialZoom,
-        ui: { components: ['attribution'] }
-      })
-      await mv.when()
-      viewRef.current = mv
-      setView(mv)
-    }
+      });
+    })();
 
-    init().catch(console.error)
     return () => {
-      mv?.destroy()
-      viewRef.current = null
-    }
-  }, [initialCenter, initialZoom])
+      if (view) view.destroy();
+    };
+  }, [initialCenter, initialZoom]);
 
-  return (
-    <div ref={containerRef} style={style}>
-      {view &&
-        React.Children.map(children, child =>
-          React.cloneElement(child, { view })
-        )}
-    </div>
-  )
+  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }
