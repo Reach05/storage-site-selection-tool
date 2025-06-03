@@ -1,21 +1,27 @@
 // server.cjs
-import fs from "fs";
-import https from "https";
-import path from "path";
-import next from "next";
+const fs = require("fs");
+const https = require("https");
+const path = require("path");
+const next = require("next");
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-// respect PORT env var for flexibility
+// Allow overriding the port via the PORT env var
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 
 app.prepare().then(() => {
-  const cert = fs.readFileSync(path.join(__dirname, "localhost+2.pem"));
-  const key  = fs.readFileSync(path.join(__dirname, "localhost+2-key.pem"));
+  // Load your mkcert‐generated certs
+  const certPath = path.join(__dirname, "localhost+2.pem");
+  const keyPath = path.join(__dirname, "localhost+2-key.pem");
 
-  const server = https.createServer({ cert, key }, (req, res) => handle(req, res));
+  const cert = fs.readFileSync(certPath);
+  const key = fs.readFileSync(keyPath);
+
+  const server = https.createServer({ cert, key }, (req, res) => {
+    return handle(req, res);
+  });
 
   server
     .listen(PORT, () => {
@@ -24,8 +30,7 @@ app.prepare().then(() => {
     .on("error", (err) => {
       if (err.code === "EADDRINUSE") {
         console.error(
-          `Port ${PORT} is already in use. ` +
-          `Either free it or set a different port via the PORT env var.`
+          `Port ${PORT} is already in use. Free it or set a different PORT env var.`
         );
         process.exit(1);
       }

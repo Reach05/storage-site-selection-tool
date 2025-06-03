@@ -37,3 +37,7 @@ Thumbs.db
 
 # ignore hint config
 .hintrc
+
+# ensure TS config and Next.js env typings are tracked
+!tsconfig.json
+!next-env.d.tsnpm install

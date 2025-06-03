@@ -1,11 +1,20 @@
-// next.config.js
+// next.config.mjs
 import webpack from "webpack";
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+export default {
+  // These must match exactly how you open your browser in dev:
+  allowedDevOrigins: [
+    "http://localhost:3000",
+    "http://10.211.55.7:3000"
+    // If you ever run `npm run dev:https`, also add:
+    // "https://localhost:3000",
+    // "https://10.211.55.7:3000"
+  ],
+
   webpack(config, { isServer, webpack: wp }) {
-    // 1. Stub ResizeObserver on the server to prevent SSR errors
     if (isServer) {
+      // Stub out ResizeObserver on the Node/server side so SSR won’t crash:
       config.plugins.push(
         new wp.DefinePlugin({
           "global.ResizeObserver": `(class {
@@ -17,21 +26,15 @@ const nextConfig = {
       );
     }
 
-    // 2. Silence specific development warnings
+    // Suppress two known nonfatal warnings (ArcGIS CSS + Autoprefixer):
     config.ignoreWarnings = config.ignoreWarnings || [];
-    config.ignoreWarnings.push(
-      // ArcGIS CSS cache‐serialization warning
-      (warning) =>
-        warning.message?.includes("Skipped not serializable cache item")
+    config.ignoreWarnings.push((warning) =>
+      warning.message?.includes("Skipped not serializable cache item")
     );
-    config.ignoreWarnings.push(
-      // Autoprefixer “start value has mixed support” warning
-      (warning) => warning.message?.includes("start value has mixed support")
+    config.ignoreWarnings.push((warning) =>
+      warning.message?.includes("start value has mixed support")
     );
 
     return config;
   },
 };
-
-export default nextConfig;
- 

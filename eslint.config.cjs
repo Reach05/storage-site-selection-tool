@@ -1,0 +1,23 @@
+// eslint.config.cjs
+module.exports = {
+  root: true,
+  extends: ["next/core-web-vitals", "plugin:react/recommended"],
+  plugins: ["react"],
+  rules: {
+    "react/jsx-pascal-case": [
+      "error",
+      {
+        allowAllCaps: false,
+        ignore: [],
+        allowLeadingUnderscore: false,
+      },
+    ],
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+  },
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
+};
