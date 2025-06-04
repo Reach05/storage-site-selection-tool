@@ -1,27 +1,17 @@
-// pages/map-view.jsx
 import dynamic from "next/dynamic";
+import Head from "next/head";
 
-const MapView = dynamic(() => import("../components/MapView"), {
+const ArcGISMapView = dynamic(() => import("../components/MapView"), {
   ssr: false,
-  loading: () => (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        fontFamily: "sans-serif",
-      }}
-    >
-      <p>Loading map…</p>
-    </div>
-  ),
 });
 
 export default function MapPage() {
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <MapView initialCenter={[39.8283, -98.5795]} initialZoom={3} />
-    </div>
+    <>
+      <Head>
+        <title>Interactive Map View</title>
+      </Head>
+      <ArcGISMapView />
+    </>
   );
 }

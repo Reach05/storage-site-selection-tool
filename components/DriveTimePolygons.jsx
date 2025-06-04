@@ -1,80 +1,51 @@
 // components/DriveTimePolygons.jsx
-import React, { useEffect, useRef } from "react";
+import { useEffect } from "react";
+import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import Graphic from "@arcgis/core/Graphic";
 
-export default function DriveTimePolygons({
-  polygons = [],                 // Array of GeoJSON‐style features
-  basemap = "topo-vector",
-  center = [-98.5795, 39.8283],
-  zoom = 5
-}) {
-  const containerRef = useRef(null);
-  const viewRef = useRef(null);
-
+export default function DriveTimePolygons({ view }) {
   useEffect(() => {
-    let view;
+    if (!view) return;
 
-    (async () => {
-      // 1) Dynamically load the ArcGIS classes needed
-      const [
-        MapModule,
-        MapViewModule,
-        GraphicsLayerModule,
-        GraphicModule,
-        PolygonModule,
-        SimpleFillSymbolModule,
-      ] = await Promise.all([
-        import("@arcgis/core/Map").then((m) => m.default),
-        import("@arcgis/core/views/MapView").then((m) => m.default),
-        import("@arcgis/core/layers/GraphicsLayer").then((m) => m.default),
-        import("@arcgis/core/Graphic").then((m) => m.default),
-        import("@arcgis/core/geometry/Polygon").then((m) => m.default),
-        import("@arcgis/core/symbols/SimpleFillSymbol").then((m) => m.default),
-      ]);
+    try {
+      const layer = new GraphicsLayer();
+      view.map.add(layer);
 
-      // 2) Create map & view
-      const map = new MapModule({ basemap });
-      view = new MapViewModule({
-        container: containerRef.current,
-        map,
-        center,
-        zoom,
+      const polygon = {
+        type: "polygon",
+        rings: [
+          [-118.25, 34.05],
+          [-118.20, 34.05],
+          [-118.20, 34.10],
+          [-118.25, 34.10],
+          [-118.25, 34.05],
+        ],
+        spatialReference: { wkid: 4326 },
+      };
+
+      const graphic = new Graphic({
+        geometry: polygon,
+        symbol: {
+          type: "simple-fill",
+          color: [255, 0, 0, 0.3],
+          outline: { color: [255, 0, 0], width: 1 },
+        },
       });
-      viewRef.current = view;
 
-      // 3) Add a GraphicsLayer for polygons
-      const graphicsLayer = new GraphicsLayerModule();
-      map.add(graphicsLayer);
-
-      // 4) For each feature, create a Graphic
-      polygons.forEach((feature) => {
-        const { coordinates } = feature.geometry;
-        const polygonGeom = new PolygonModule({
-          rings: coordinates,
-          spatialReference: { wkid: 4326 },
-        });
-
-        const fillSymbol = new SimpleFillSymbolModule({
-          color: [51, 92, 160, 0.4],
-          outline: { color: [51, 92, 160], width: 2 },
-        });
-
-        const graphic = new GraphicModule({
-          geometry: polygonGeom,
-          symbol: fillSymbol,
-          attributes: feature.properties || {},
-        });
-
-        graphicsLayer.add(graphic);
-      });
-    })();
+      layer.add(graphic);
+    } catch (err) {
+      console.error("DriveTimePolygons failed to render:", err);
+    }
 
     return () => {
-      if (viewRef.current) {
-        viewRef.current.destroy();
-        viewRef.current = null;
-      }
+      try {
+        const layerToRemove = view.map.allLayers.find(
+          (l) => l.title === "Drive Time"
+        );
+        if (layerToRemove) view.map.remove(layerToRemove);
+      } catch (_) {}
     };
-  }, [polygons, basemap, center, zoom]);
+  }, [view]);
 
-  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
+  return null;
 }

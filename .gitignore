@@ -42,3 +42,6 @@ Thumbs.db
 !tsconfig.json
 !next-env.d.tsnpm install
 !postcss.config.cjs
+
+# explicitly track LegendPanel
+!components/LegendPanel.js

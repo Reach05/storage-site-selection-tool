@@ -1,93 +1,46 @@
 // pages/drive-time.jsx
-import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import React, { useEffect, useState } from "react";
 
-const DriveTimePolygons = dynamic(
-  () => import("../components/DriveTimePolygons"),
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          fontFamily: "sans-serif",
-        }}
-      >
-        <p>Loading drive‐time data…</p>
-      </div>
-    ),
-  }
+const MapViewComponent = dynamic(
+  () => import("../components/MapView"),
+  { ssr: false }
 );
 
 export default function DriveTimePage() {
-  const [features, setFeatures] = useState([]);
-  const [error, setError] = useState(null);
+  const [polygons, setPolygons] = useState(null);
 
   useEffect(() => {
-    // The actual ArcGIS FeatureServer URL:
-    const DRIVE_TIME_FEATURE_URL =
-      "https://rdmi05.maps.arcgis.com/arcgis/rest/services/DriveTimeService/FeatureServer/0";
+    // 1) If your REST service supports CORS, you can fetch directly; otherwise proxy it
+    const url =
+      "https://rdmi05.maps.arcgis.com/arcgis/rest/services/DriveTimeService/FeatureServer/0/query?f=geojson&where=1=1&outFields=*";
 
-    // Build the query‐features endpoint call:
-    const apiUrl = `/api/query-features?url=${encodeURIComponent(
-      DRIVE_TIME_FEATURE_URL
-    )}/query&where=1%3D1&outFields=*&f=geojson`;
-
-    fetch(apiUrl)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Server responded ${res.status}`);
+    fetch(url)
+      .then((r) => {
+        if (!r.ok) {
+          throw new Error(`Server responded ${r.status}`);
         }
-        return res.json();
+        return r.json();
       })
-      .then((data) => {
-        // data.features is an array of GeoJSON features
-        setFeatures(data.features || []);
+      .then((geojson) => {
+        setPolygons(geojson);
       })
       .catch((err) => {
-        console.error("Error fetching drive‐time features:", err);
-        setError(err.message);
+        console.error("Error fetching drive‐time GeoJSON:", err);
       });
   }, []);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      {error ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-            color: "red",
-            fontFamily: "sans-serif",
-          }}
-        >
-          <p>Error: {error}</p>
-        </div>
-      ) : features.length > 0 ? (
-        <DriveTimePolygons
-          polygons={features}
-          basemap="topo-vector"
-          center={[-98.5795, 39.8283]}
-          zoom={5}
-        />
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-            fontFamily: "sans-serif",
-          }}
-        >
-          <p>Fetching drive‐time polygons…</p>
-        </div>
-      )}
+      <MapViewComponent
+        initialCenter={[39.8283, -98.5795]}
+        initialZoom={3}
+        basemap="streets"
+        // If MapViewComponent accepted an overlay prop, pass polygons here.
+        // For example: <MapViewComponent overlays={{ driveTime: polygons }} />
+      />
+      {/* In MapViewComponent, you could watch for `polygons` prop and add a 
+          GeoJSONLayer or Graphics for those features onto the view. */}
     </div>
   );
 }

@@ -1,13 +1,13 @@
 /* styles/globals.css */
 
+/* Reset margins & padding, force 100% height full‐screen for the Next.js root. */
 html,
 body,
 #__next {
   height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
 }
 
-body {
-  font-family: sans-serif;
-}
+/* If you have any other global overrides, they can go here. */

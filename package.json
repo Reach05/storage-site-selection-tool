@@ -18,7 +18,6 @@
   "overrides": {
     "braces": ">=3.0.3",
     "micromatch": ">=4.0.4",
-    "postcss": ">=8.4.31",
     "glob": "^9.3.1",
     "inflight": "^1.0.7",
     "node-domexception": "npm:domexception@^2.0.1"

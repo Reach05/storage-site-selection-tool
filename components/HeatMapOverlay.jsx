@@ -1,90 +1,34 @@
 // components/HeatMapOverlay.jsx
-import React, { useEffect, useRef } from "react";
-import esriConfig from "@arcgis/core/config";
+import { useEffect } from "react";
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 
-export default function HeatMapOverlay({
-  dataUrl,
-  geojson, // newly added prop
-  basemap = "topo-vector",
-  center = [-98.5795, 39.8283],
-  zoom = 5,
-}) {
-  const containerRef = useRef(null);
-  const viewRef = useRef(null);
-
+export default function HeatMapOverlay({ view }) {
   useEffect(() => {
-    esriConfig.logLevel = "error";
-    let view;
+    if (!view) return;
 
-    (async () => {
-      const [
-        MapModule,
-        MapViewModule,
-        GeoJSONLayerModule,
-        HeatmapRendererModule,
-      ] = await Promise.all([
-        import("@arcgis/core/Map").then((m) => m.default),
-        import("@arcgis/core/views/MapView").then((m) => m.default),
-        import("@arcgis/core/layers/GeoJSONLayer").then((m) => m.default),
-        import("@arcgis/core/renderers/HeatmapRenderer").then((m) => m.default),
-      ]);
-
-      const map = new MapModule({ basemap });
-      view = new MapViewModule({
-        container: containerRef.current,
-        map,
-        center,
-        zoom,
-      });
-      viewRef.current = view;
-
-      // Define the heatmap renderer (adjust field name if necessary)
-      const heatmapRenderer = new HeatmapRendererModule({
-        field: "value",
+    const layer = new FeatureLayer({
+      url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/LA_Trees/FeatureServer/0", // Replace if needed
+      renderer: {
+        type: "heatmap",
         colorStops: [
-          { ratio: 0, color: "rgba(63,40,102,0)" },
-          { ratio: 0.2, color: "rgba(65,182,196,0.5)" },
-          { ratio: 0.4, color: "rgba(127,205,187,0.5)" },
-          { ratio: 0.6, color: "rgba(199,234,229,0.5)" },
-          { ratio: 0.8, color: "rgba(237,248,177,0.5)" },
-          { ratio: 1, color: "rgba(255,255,217,0.5)" },
+          { ratio: 0, color: "rgba(255,255,255,0)" },
+          { ratio: 0.2, color: "blue" },
+          { ratio: 0.5, color: "yellow" },
+          { ratio: 0.9, color: "red" },
         ],
-        radius: 30,
-      });
+        maxPixelIntensity: 100,
+        minPixelIntensity: 0,
+      },
+    });
 
-      let heatmapLayer;
-      if (geojson) {
-        // Use in-memory GeoJSON source
-        heatmapLayer = new GeoJSONLayerModule({
-          source: geojson,
-          renderer: heatmapRenderer,
-          popupTemplate: {
-            title: "{name}",
-            content: "{value}",
-          },
-        });
-      } else {
-        // Fallback to URL if no geojson passed
-        heatmapLayer = new GeoJSONLayerModule({
-          url: dataUrl,
-          renderer: heatmapRenderer,
-          popupTemplate: {
-            title: "{name}",
-            content: "{value}",
-          },
-        });
-      }
-
-      map.add(heatmapLayer);
-    })();
+    view.map.add(layer).catch((err) => {
+      console.error("HeatMapOverlay failed to load:", err);
+    });
 
     return () => {
-      if (viewRef.current) {
-        viewRef.current.destroy();
-        viewRef.current = null;
-      }
+      view.map.remove(layer).catch(() => {});
     };
-  }, [dataUrl, geojson, basemap, center, zoom]);
+  }, [view]);
 
-  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
+  return null;
 }
