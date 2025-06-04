@@ -1,19 +1,32 @@
-// filepath: scripts/copy-arcgis-assets.js
-import { emptyDir, copy } from 'fs-extra'
-import { fileURLToPath } from 'url'
-import path from 'path'
+// scripts/copy-arcgis-assets.js
+import fs from "fs-extra";
+import path from "path";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const src = path.resolve(__dirname, '../node_modules/@arcgis/core/assets')
-const dest = path.resolve(__dirname, '../public/arcgis/assets')
+(async () => {
+  // Make sure we’re running from the project root (where package.json lives):
+  const projectRoot = process.cwd();
+  console.log("  Project root is:", projectRoot);
 
-async function main() {
-  await emptyDir(dest)
-  await copy(src, dest)
-  console.log('✅ ArcGIS assets copied to public/arcgis/assets')
-}
+  // Source: <projectRoot>/node_modules/@arcgis/core/assets
+  const source = path.join(projectRoot, "node_modules", "@arcgis", "core", "assets");
 
-main().catch((e) => {
-  console.error(e)
-  process.exit(1)
-})
+  // Destination: <projectRoot>/public/arcgis/assets
+  const dest = path.join(projectRoot, "public", "arcgis", "assets");
+
+  console.log("  Copying ArcGIS assets from:");
+  console.log("     ", source);
+  console.log("     → to ", dest);
+
+  try {
+    // 1) Remove any old copy
+    await fs.remove(dest);
+
+    // 2) Copy the entire @arcgis/core/assets folder
+    await fs.copy(source, dest);
+
+    console.log("✅ ArcGIS assets copied to public/arcgis/assets");
+  } catch (err) {
+    console.error("❌ Failed to copy ArcGIS assets:", err);
+    process.exit(1);
+  }
+})();

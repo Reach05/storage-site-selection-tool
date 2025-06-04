@@ -1,11 +1,12 @@
 // pages/_app.jsx
+import "@arcgis/core/assets/esri/themes/light/main.css";
 import "../styles/globals.css";
+
+import { useEffect } from "react";
 import esriConfig from "@arcgis/core/config";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { useEffect } from "react";
 
 export default function MyApp({ Component, pageProps }) {
-  // Only set the Esri assetsPath on the client
   useEffect(() => {
     if (typeof window !== "undefined") {
       esriConfig.assetsPath = "/arcgis/assets/";
