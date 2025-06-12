@@ -17,11 +17,7 @@ jobs:
         run: zip -r site-selection-tool.zip ./*
 
       - name: Create Git Tag
-        run: |
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
-          git tag -a v${{ github.run_number }} -m "Release ${{ github.run_number }}"
-          git push origin v${{ github.run_number }}
+        run: git tag v${{ github.run_number }} && git push origin v${{ github.run_number }}
 
       - name: Create GitHub Release
         id: create_release
