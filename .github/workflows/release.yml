@@ -1,36 +1,46 @@
-name: 🚀 Release ZIP
+name: Release
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0      # get all tags so push will work
 
-      - name: Create ZIP archive
-        run: zip -r site-selection-tool.zip ./*
+      - name: Debug existing tags
+        run: git tag -l
 
       - name: Create Git Tag
-        run: git tag v${{ github.run_number }} && git push origin v${{ github.run_number }}
+        id: create_tag
+        run: |
+          echo "GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
+          if [ -z "$GITHUB_RUN_NUMBER" ]; then
+            echo "⚠️ run_number is empty—falling back to short SHA"
+            TAG="v${GITHUB_SHA::7}"
+          else
+            TAG="v${GITHUB_RUN_NUMBER}"
+          fi
+          echo "📝 creating and pushing tag: $TAG"
+          git tag "$TAG"
+          git push origin "$TAG"
+          echo "tag_name=$TAG" >> "$GITHUB_OUTPUT"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: false
 
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ github.run_number }}
-          name: Release ${{ github.run_number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload ZIP to Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: site-selection-tool.zip
+          tag_name: ${{ steps.create_tag.outputs.tag_name }}
+          name: Release ${{ steps.create_tag.outputs.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
