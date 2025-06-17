@@ -16,6 +16,8 @@ node_modules/
 
 # ── Vercel / Cloud Run artifacts ──
 site-selection-tool.zip
+.vercel
+.fake
 
 # ── Screenshots & IDE workspaces ──
 screenshots/
@@ -27,21 +29,21 @@ Thumbs.db
 .idea/
 .vscode/
 
-.vercel
-.fake
+# ── ArcGIS assets (exclude SASS/SCSS) ──
+public/arcgis/assets/**/*.scss
+public/arcgis/assets/**/*.sass
 
-# allow our well-known stub
+# ── Allow our well-known stubs ──
 !public/empty.json
 !public/.well-known/appspecific/
 !public/.well-known/appspecific/com.chrome.devtools.json
 
-# ignore hint config
+# ── Ignore hint config ──
 .hintrc
 
-# ensure TS config and Next.js env typings are tracked
+# ── Ensure TS config & Next.js env typings are tracked ──
 !tsconfig.json
-!next-env.d.tsnpm install
+!next-env.d.ts
 !postcss.config.cjs
 
-# explicitly track LegendPanel
-!components/LegendPanel.js
+# ── Track specific components
