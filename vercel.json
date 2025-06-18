@@ -1,8 +1,19 @@
+
 {
   "version": 2,
-  "builds": [{ "src": "package.json", "use": "@vercel/next" }],
-  "routes": [
-    { "src": "/screenshots/(.*)", "dest": "/public/screenshots/$1" },
-    { "src": "/(.*)", "dest": "/$1" }
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "HEATMAP_SERVICE_URL": "...",
+    "DRIVETIME_SERVICE_URL": "...",
+    "FLOODZONE_SERVICE_URL": "..."
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/:path*" }
   ]
 }
+

@@ -33,6 +33,7 @@ Thumbs.db
 public/arcgis/assets/**/*.scss
 public/arcgis/assets/**/*.sass
 
+
 # ── Allow our well-known stubs ──
 !public/empty.json
 !public/.well-known/appspecific/
