@@ -1,12 +1,6 @@
 
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
   "env": {
     "HEATMAP_SERVICE_URL": "...",
     "DRIVETIME_SERVICE_URL": "...",
@@ -16,4 +10,3 @@
     { "source": "/api/:path*", "destination": "/api/:path*" }
   ]
 }
-

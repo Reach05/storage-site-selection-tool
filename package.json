@@ -19,8 +19,7 @@
     "braces": ">=3.0.3",
     "micromatch": ">=4.0.4",
     "glob": "^9.3.1",
-    "inflight": "^1.0.7",
-    "node-domexception": "npm:domexception@^2.0.1"
+    "inflight": "^1.0.7"
   },
   "dependencies": {
     "@arcgis/core": "^4.32.10",
